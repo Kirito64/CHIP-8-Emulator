@@ -186,6 +186,7 @@ class CPU {
                     this.halted = true
                     throw new Error('Memory out of bounds.')
                 }
+                //TODO COmplete this and next two instructions as per instructionset 
         }   
 
     }
