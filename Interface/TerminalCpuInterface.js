@@ -34,9 +34,14 @@ class TerminalCPUInterface extends CPUInterface{
             process.exit(0)
         })
 
-        //TODO KeyPress event 
+        //KeyPress event 
 
-
+        this.screen.on("keypress", (_, key)=>{
+            const keyIndex = keyMap.indexOf(key.full)
+            if(keyIndex>-1){
+                this._setKeys(keyIndex)
+            }
+        })
 
         setInterval(()=>{
             this._resetKeys()
@@ -71,8 +76,18 @@ class TerminalCPUInterface extends CPUInterface{
     }
 
     drawPixel(){
-        //TODO complete drawPixel with blessed
-    }
+        const collision = this.frameBuffer[y][x] & value
+        this.frameBuffer[y][x] ^= value
+        if (this.frameBuffer[y][x]) {
+            this.screen.fillRegion(this.color, '█', x, x + 1, y, y + 1)
+        } 
+        else {
+            this.screen.clearRegion(x, x + 1, y, y + 1)
+        }
+        this.screen.render()
+        return collision
+
+}
 
 
 
