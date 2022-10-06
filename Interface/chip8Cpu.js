@@ -27,8 +27,9 @@ chip8_fontSet = [
 
 
 class CPU {
-    constructor() {
+    constructor(interface) {
         this.reset()
+        this.interface = interface
     }
 
     reset(){
@@ -186,7 +187,22 @@ class CPU {
                     this.halted = true
                     throw new Error('Memory out of bounds.')
                 }
-                //TODO COmplete this and next two instructions as per instructionset 
+
+                this.registers[0xf] = 0
+                for (let i = 0; i < args[2]; i++) {
+                    let line = this.memory[this.I + i]
+                    for (let position = 0; position < 8; position++) {
+                        let value = line & (1 << (7 - position)) ? 1 : 0
+                        let x = (this.registers[args[0]] + position) % DISPLAY_WIDTH
+                        let y = (this.registers[args[1]] + i) % DISPLAY_HEIGHT
+                        if (this.interface.drawPixel(x, y, value)) {
+                            this.registers[0xf] = 1
+                        }
+                    }
+                }
+                this._nextInstruction()
+                break
+                
         }   
 
     }
