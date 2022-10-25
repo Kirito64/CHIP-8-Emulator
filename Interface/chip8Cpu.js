@@ -133,6 +133,24 @@ class CPU {
       this.memory[memoryStart + 2 * i + 1] = romData[i] & 0x00ff
     }
   }
+
+  tick() {
+    if (this.DT > 0) {
+      // Decrement the delay timer by one until it reaches zero
+      this.DT--
+    }
+
+    if (this.ST > 0) {
+      // The sound timer is active whenever the sound timer register (ST) is non-zero.
+      this.ST--
+    } else {
+      // When ST reaches zero, the sound timer deactivates.
+      if (this.soundEnabled) {
+        this.interface.disableSound()
+        this.soundEnabled = false
+      }
+    }
+  }
  
 
   _fetch = () => {
