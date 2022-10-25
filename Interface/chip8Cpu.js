@@ -108,6 +108,33 @@ class CPU {
     this.soundEnabled = false;
   }
 
+  load(romBuffer) {
+    // Reset the CPU every time it is loaded
+    this.reset()
+
+    // 0-80 in memory is reserved for font set
+    for (let i = 0; i < FONT_SET.length; i++) {
+      this.memory[i] = FONT_SET[i]
+    }
+
+    // Get ROM data from ROM buffer
+    const romData = romBuffer.data
+    let memoryStart = 0x200
+
+    this.halted = false
+
+    // Place ROM data in memory starting at 0x200
+    // Since memory is stored in an 8-bit array and opcodes are 16-bit, we have
+    // to store the opcodes across two indices in memory
+    for (let i = 0; i < romData.length; i++) {
+      // set the first index with the most significant byte (i.e., 0x1234 would be 0x12)
+      this.memory[memoryStart + 2 * i] = romData[i] >> 8
+      // set the second index with the least significant byte (i.e., 0x1234 would be 0x34)
+      this.memory[memoryStart + 2 * i + 1] = romData[i] & 0x00ff
+    }
+  }
+ 
+
   _fetch = () => {
     return (this.memory[PC] << 8) | (this.memory[PC + 1] << 0);
   };
