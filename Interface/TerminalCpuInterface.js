@@ -7,10 +7,9 @@ const DISPLAY_WIDTH = 64
 const COLOR = "#ffffff"
 
 
-class TerminalCPUInterface extends CPUInterface{
+class TerminalCPUInterface{
 
     constructor(){
-        super()
 
         this.blessed = blessed 
 
@@ -68,7 +67,7 @@ class TerminalCPUInterface extends CPUInterface{
         this.keyPressed = undefined
     }
     
-    _setKeys(keyIndex) {
+    setKeys(keyIndex) {
         let keyMask = 1 << keyIndex
     
         this.keys = this.keys | keyMask
@@ -87,8 +86,36 @@ class TerminalCPUInterface extends CPUInterface{
         this.screen.render()
         return collision
 
+    }
+    waitKey() {
+        // Get and reset key
+        const keyPressed = this.keyPressed
+        this.keyPressed = undefined
+
+        return keyPressed
+    } 
+
+    getKeys() {
+        return this.keys
+    }
+
+    clearDisplay() {
+        this.frameBuffer = this._createFrameBuffer()
+        this.screen.clearRegion(0, DISPLAY_WIDTH, 0, DISPLAY_HEIGHT)
+    }
+
+    enableSound() {
+        this.soundEnabled = true
+    }
+
+    disableSound() {
+        this.soundEnabled = false
+    }
+
+
+
+
+
 }
 
-
-
-}
+module.exports = {TerminalCPUInterface}

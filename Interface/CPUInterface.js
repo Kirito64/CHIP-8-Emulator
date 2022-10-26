@@ -3,7 +3,6 @@ class CPUInterface{
     constructor(){
         if(new.target === CPUInterface)
             throw new TypeError("Cant Instatiate abstract class")
-        
     }
 
     clearDisplay(){
@@ -32,4 +31,4 @@ class CPUInterface{
 
 }
 
-module.epxorts = {CPUInterface}
+module.exports = {CPUInterface}

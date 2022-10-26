@@ -323,14 +323,16 @@ const instructions = [
 ]
 
 disassembleOpCode = (op)=>{
+   console.log(op.toString(16)) 
     const instruction = instructions.find((instruction)=>(op&instruction.mask)===instruction.pattern)
-
+    if(!instruction)
+        throw new Error("Invalid Istruction OpCode " + op)
     const args = instruction.arguments.map((arg)=>{
         return(
             (op&arg.mask)>>arg.shift
         )
     })
-
+    console.log(instruction)
     return {instruction, args}
 }
 

@@ -1,4 +1,4 @@
-const { instructions, disassembleOpCode } = require("./instructionset");
+const { instructions, disassembleOpCode } = require("../instructionset");
 
 function getRandomInt(min, max) {
   min = Math.ceil(min);
@@ -6,7 +6,7 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-chip8_fontSet = [
+FONT_SET = [
   0xf0,
   0x90,
   0x90,
@@ -90,9 +90,19 @@ chip8_fontSet = [
 ];
 
 class CPU {
-  constructor(interface) {
-    this.reset();
-    this.interface = interface;
+  constructor(CPUinterface) {
+    this.interface = CPUinterface;
+    this.memory = new Uint8Array(4096);
+    this.registers = new Uint8Array(16);
+    this.stack = new Uint16Array(16);
+    this.ST = 0;
+    this.DT = 0;
+    this.I = 0;
+    this.SP = -1;
+    this.PC = 0x200;
+    this.halted = true;
+    this.soundEnabled = false;
+
   }
 
   reset() {
@@ -151,10 +161,32 @@ class CPU {
       }
     }
   }
+  halt() {
+    this.halted = true
+  }
+
+  step() {
+    if (this.halted) {
+      throw new Error(
+        'A problem has been detected and Chip-8 has been shut down to prevent damage to your computer.'
+      )
+    }
+
+    // Fetch 16-bit opcode from memory
+    const opcode = this._fetch()
+
+    // Decode the opcode and get an object with the instruction and arguments
+    const instruction = this._decode(opcode)
+
+    // Execute code based on the instruction set
+    this._execute(instruction)
+  }
  
 
   _fetch = () => {
-    return (this.memory[PC] << 8) | (this.memory[PC + 1] << 0);
+    let op = (this.memory[this.PC] << 8) | (this.memory[this.PC + 1] << 0)
+    console.log(op.toString(16))
+    return (this.memory[this.PC] << 8) | (this.memory[this.PC + 1] << 0);
   };
 
   _decode = (opcode) => {
@@ -169,9 +201,9 @@ class CPU {
     this.PC = this.PC + 4;
   };
 
-  _execute = (instruction) => {
-    const { I, args } = instruction;
-
+  _execute = (i) => {
+    const { instruction, args } = i;
+    const I = instruction
     switch (I.id) {
       case "CLS":
         this._nextInstruction();
